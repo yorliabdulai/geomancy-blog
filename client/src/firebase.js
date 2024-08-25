@@ -6,12 +6,12 @@ import { initializeApp } from 'firebase/app';
 // Your web app's Firebase configuration
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyC2gDpNW4NtSgNzOw0D0rbErECwg_4Q19c',
-  authDomain: 'geomancy-edu.firebaseapp.com',
-  projectId: 'geomancy-edu',
-  storageBucket: 'geomancy-edu.appspot.com',
-  messagingSenderId: '682315171119',
-  appId: '1:682315171119:web:beab43f618462489cd4dda',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
