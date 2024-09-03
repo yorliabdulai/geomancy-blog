@@ -17,4 +17,17 @@ export default defineConfig({
       external: ['mongoose'],
     },
   },
+  projects: [
+    {
+      src: "client/",
+      use: "@vercel/static-build",
+      config: {
+        distDir: "build"
+      }
+    },
+    {
+      src: "api/",
+      use: "@vercel/node"
+    }
+  ]
 });
