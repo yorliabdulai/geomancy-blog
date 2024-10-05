@@ -10,6 +10,7 @@ import path from 'path';
 
 dotenv.config();
 
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO)
   .then(() => {
@@ -20,27 +21,27 @@ mongoose
   });
 
 const __dirname = path.resolve();
-
 const app = express();
 
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000!');
-});
-
+// Routes
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/comment', commentRoutes);
 
+// Serve static files
 app.use(express.static(path.join(__dirname, '/client/dist')));
 
+// Handle all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
 
+// Error handler middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -49,4 +50,10 @@ app.use((err, req, res, next) => {
     statusCode,
     message,
   });
+});
+
+// Set the port, use process.env.PORT or default to 5000
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}!`);
 });
