@@ -7,36 +7,40 @@ import postRoutes from './routes/post.route.js';
 import commentRoutes from './routes/comment.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import cors from 'cors';  // Updated import for consistency
 
-dotenv.config();
+dotenv.config(); // Load env variables
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO)
-  .then(() => {
-    console.log('MongoDb is connected');
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-const __dirname = path.resolve();
 const app = express();
+
+// Enable CORS
+app.use(cors());
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
 
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO)
+  .then(() => {
+    console.log('MongoDB is connected');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
 // Routes
 app.use('/api/user', userRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);  // Ensure this route exists
 app.use('/api/post', postRoutes);
 app.use('/api/comment', commentRoutes);
 
-// Serve static files
+// Serve static files from client build
+const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, '/client/dist')));
 
-// Handle all other routes
+// Handle unknown routes (for the frontend to handle its own routing)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
@@ -52,7 +56,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Set the port, use process.env.PORT or default to 5000
+// Set port and start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}!`);
