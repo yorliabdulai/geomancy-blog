@@ -1,10 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import userRoutes from './routes/user.route.js';
-import authRoutes from './routes/auth.route.js';
-import postRoutes from './routes/post.route.js';
-import commentRoutes from './routes/comment.route.js';
+import userRoutes from '../api/routes/user.route.js';
+import authRoutes from '../api/routes/auth.route.js';
+import postRoutes from '../api/routes/post.route.js';
+import commentRoutes from '../api/routes/comment.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';  // Updated import for consistency
@@ -14,7 +14,10 @@ dotenv.config(); // Load env variables
 const app = express();
 
 // Enable CORS
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true,
+}));
 
 // Middleware
 app.use(express.json());
