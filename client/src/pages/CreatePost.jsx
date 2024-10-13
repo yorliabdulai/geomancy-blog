@@ -62,19 +62,21 @@ export default function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/post/create', {
+      const res = await fetch('http://localhost:3001/api/post/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',  // This ensures the cookie is sent with the request
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+  
       if (!res.ok) {
         setPublishError(data.message);
         return;
       }
-
+  
       if (res.ok) {
         setPublishError(null);
         navigate(`/post/${data.slug}`);
@@ -83,6 +85,9 @@ export default function CreatePost() {
       setPublishError('Something went wrong');
     }
   };
+  
+  
+  
   return (
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
