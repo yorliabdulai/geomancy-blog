@@ -62,7 +62,7 @@ export default function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3001/api/post/create', {
+      const res = await fetch('https://geomancy-blog.onrender.com/api/post/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

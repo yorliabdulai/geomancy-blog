@@ -26,7 +26,7 @@ export default function Header() {
 
   const handleSignout = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/user/signout', {
+      const res = await fetch('https://geomancy-blog.onrender.com/api/user/signout', {
         method: 'POST',
       });
       const data = await res.json();

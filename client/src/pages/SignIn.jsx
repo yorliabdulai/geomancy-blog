@@ -27,7 +27,7 @@ export default function SignIn() {
     }
     try {
       dispatch(signInStart());
-      const res = await fetch('http://localhost:3001/api/auth/signin', {
+      const res = await fetch('https://geomancy-blog.onrender.com/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
