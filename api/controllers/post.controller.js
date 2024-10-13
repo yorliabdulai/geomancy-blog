@@ -4,7 +4,7 @@ import { errorHandler } from '../utils/error.js';
 export const create = async (req, res, next) => {
   try {
     // Check if the user exists and is an admin
-    if (!req.user) {
+    if (!req.user || !req.user.isAdmin) {
       return res.status(403).json({ message: 'You are not allowed to create a post' });
     }
 
