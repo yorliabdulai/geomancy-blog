@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 export default function CreatePost() {
   const [file, setFile] = useState(null);
@@ -59,32 +60,41 @@ export default function CreatePost() {
       console.log(error);
     }
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('https://geomancy-blog.onrender.com/api/post/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',  // This ensures the cookie is sent with the request
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-  
-      if (!res.ok) {
-        setPublishError(data.message);
-        return;
-      }
-  
-      if (res.ok) {
-        setPublishError(null);
-        navigate(`/post/${data.slug}`);
-      }
-    } catch (error) {
-      setPublishError('Something went wrong');
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const token = Cookies.get('access_token');
+    if (!token) {
+      setPublishError('No access token found. Please log in again.');
+      return;
     }
-  };
+
+    const res = await fetch('https://geomancy-blog.onrender.com/api/post/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      credentials: 'include',
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      setPublishError(data.message || 'Failed to create post');
+      return;
+    }
+
+    if (res.ok) {
+      setPublishError(null);
+      navigate(`/post/${data.slug}`);
+    }
+  } catch (error) {
+    setPublishError('Something went wrong');
+    console.error('Error creating post:', error);
+  }
+};
   
   
   
