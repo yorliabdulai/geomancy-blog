@@ -2,27 +2,35 @@ import Post from '../models/post.model.js';
 import { errorHandler } from '../utils/error.js';
 
 export const create = async (req, res, next) => {
+  console.log('User from request:', req.user);
+  if (!req.user.isAdmin) {
+    console.log('User is not admin');
+    return next(errorHandler(403, 'You are not allowed to create a post'));
+  }
+
+  if (!req.body.title || !req.body.content) {
+    console.log('Missing title or content');
+    return next(errorHandler(400, 'Please provide all required fields'));
+  }
+
+  const slug = req.body.title
+    .split(' ')
+    .join('-')
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9-]/g, '');
+
+  const newPost = new Post({
+    ...req.body,
+    slug,
+    userId: req.user.id,
+  });
+
   try {
-    // Check if the user exists and is an admin
-    if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({ message: 'You are not allowed to create a post' });
-    }
-
-    const { title, content } = req.body;
-
-    if (!title || !content) {
-      return res.status(400).json({ message: 'Title and content are required' });
-    }
-
-    const newPost = new Post({
-      title,
-      content,
-      author: req.user.id,
-    });
-
     const savedPost = await newPost.save();
+    console.log('Post saved successfully:', savedPost);
     res.status(201).json(savedPost);
   } catch (error) {
+    console.error('Error saving post:', error);
     next(error);
   }
 };
