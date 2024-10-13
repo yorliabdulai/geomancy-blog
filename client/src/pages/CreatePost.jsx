@@ -61,40 +61,46 @@ export default function CreatePost() {
     }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const token = Cookies.get('access_token');
-    if (!token) {
-      setPublishError('No access token found. Please log in again.');
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = Cookies.get('access_token');
+      console.log('Token from cookie:', token); // Log the token
 
-    const res = await fetch('https://geomancy-blog.onrender.com/api/post/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      credentials: 'include',
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
+      if (!token) {
+        setPublishError('No access token found. Please log in again.');
+        return;
+      }
 
-    if (!res.ok) {
-      setPublishError(data.message || 'Failed to create post');
-      return;
-    }
+      const res = await fetch('https://geomancy-blog.onrender.com/api/post/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      });
 
-    if (res.ok) {
-      setPublishError(null);
-      navigate(`/post/${data.slug}`);
+      console.log('Response status:', res.status); // Log the response status
+
+      const data = await res.json();
+      console.log('Response data:', data); // Log the response data
+
+      if (!res.ok) {
+        setPublishError(data.message || 'Failed to create post');
+        return;
+      }
+
+      if (res.ok) {
+        setPublishError(null);
+        navigate(`/post/${data.slug}`);
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setPublishError('Something went wrong');
     }
-  } catch (error) {
-    setPublishError('Something went wrong');
-    console.error('Error creating post:', error);
-  }
-};
+  };
   
   
   
