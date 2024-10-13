@@ -15,7 +15,7 @@ const app = express();
 
 // Enable CORS
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: 'https://geomancy-blog.vercel.app', 
   credentials: true,
 }));
 app.use((req, res, next) => {
