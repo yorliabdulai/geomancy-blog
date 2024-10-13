@@ -31,7 +31,7 @@ export default function SignIn() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-        credentials: 'include',  // This is important for cookies
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success === false) {
@@ -39,12 +39,21 @@ export default function SignIn() {
       }
 
       if (res.ok) {
-        // Instead of localStorage, set the cookie
-        Cookies.set('access_token', data.token, { expires: 7 });  // Expires in 7 days
+        console.log('Server response:', data); // Log the entire response
+        console.log('Token received:', data.token); // Log the token
+        
+        if (data.token) {
+          Cookies.set('access_token', data.token, { expires: 7 });
+          console.log('Cookie set:', Cookies.get('access_token')); // Verify the cookie was set
+        } else {
+          console.error('No token received from server');
+        }
+        
         dispatch(signInSuccess(data));
         navigate('/');
       }
     } catch (error) {
+      console.error('Sign-in error:', error);
       dispatch(signInFailure(error.message));
     }
   };
