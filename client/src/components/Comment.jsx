@@ -36,8 +36,6 @@ export default function CommentSection({ postId }) {
     e.preventDefault();
     try {
       const token = Cookies.get('access_token');
-      console.log('Token from cookie:', token);
-
       if (!token) {
         setError('Please log in to comment');
         return;
@@ -52,26 +50,23 @@ export default function CommentSection({ postId }) {
         credentials: 'include',
         body: JSON.stringify({
           content: commentContent,
-          postId,
-          userId: currentUser._id
+          postId
+          // Remove userId from here, as it will be extracted from the token on the server
         }),
       });
 
-      console.log('Response status:', res.status);
-      const data = await res.json();
-      console.log('Response data:', data);
-
       if (!res.ok) {
-        setError(data.message || 'Failed to create comment');
-        return;
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to create comment');
       }
 
+      const data = await res.json();
       setComments([data, ...comments]);
       setCommentContent('');
       setError(null);
     } catch (error) {
       console.error('Error creating comment:', error);
-      setError('Something went wrong');
+      setError(error.message || 'Something went wrong');
     }
   };
 
