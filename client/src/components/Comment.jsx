@@ -12,6 +12,8 @@ export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
+    console.log('Current user:', currentUser); // Log the current user
+    console.log('Access token:', Cookies.get('access_token')); // Log the access token
     fetchComments();
   }, [postId]);
 
@@ -36,11 +38,15 @@ export default function CommentSection({ postId }) {
     e.preventDefault();
     try {
       const token = Cookies.get('access_token');
+      console.log('Token from cookie:', token); // Log the token
+
       if (!token) {
+        console.log('No token found in cookies');
         setError('Please log in to comment');
         return;
       }
 
+      console.log('Sending request to create comment');
       const res = await fetch('https://geomancy-blog.onrender.com/api/comment/create', {
         method: 'POST',
         headers: {
@@ -54,12 +60,16 @@ export default function CommentSection({ postId }) {
         }),
       });
 
+      console.log('Response status:', res.status); // Log the response status
+
       if (!res.ok) {
         const errorData = await res.json();
+        console.log('Error response:', errorData); // Log the error response
         throw new Error(errorData.message || `Failed to create comment: ${res.status}`);
       }
 
       const data = await res.json();
+      console.log('Success response:', data); // Log the success response
       setComments([data, ...comments]);
       setCommentContent('');
       setError(null);
