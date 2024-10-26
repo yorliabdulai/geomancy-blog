@@ -51,13 +51,12 @@ export default function CommentSection({ postId }) {
         body: JSON.stringify({
           content: commentContent,
           postId
-          // Remove userId from here, as it will be extracted from the token on the server
         }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to create comment');
+        throw new Error(errorData.message || `Failed to create comment: ${res.status}`);
       }
 
       const data = await res.json();
