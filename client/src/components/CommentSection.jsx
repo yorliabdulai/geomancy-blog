@@ -174,84 +174,57 @@ export default function CommentSection({ postId }) {
           )}
         </form>
       )}
-      {comments.length === 0 ? (
-        <p className='text-sm my-5'>No comments yet!</p>
-      ) : (
-        <div className='space-y-4 mt-8'>
-          {comments.map(comment => (
-            <div key={comment._id} className='flex flex-col gap-2 border-b border-gray-200 dark:border-gray-800 pb-4'>
-              <div className='flex items-center gap-2'>
-                <img 
-                  src={comment.user?.profilePicture || '/default-profile.jpg'} 
-                  alt='' 
-                  className='w-8 h-8 rounded-full object-cover'
-                />
-                <div className='flex flex-col'>
-                  <span className='text-sm font-semibold'>{comment.user?.username || 'Anonymous'}</span>
-                  <span className='text-xs text-gray-500'>
-                    {new Date(comment.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-              <p className='text-gray-700 dark:text-gray-300'>{comment.content}</p>
-              <div className='flex gap-2 items-center'>
-                <button 
-                  onClick={() => handleLike(comment._id)}
-                  className='text-sm text-gray-500 hover:text-blue-500'
-                >
-                  Like ({comment.numberOfLikes || 0})
-                </button>
-                {(currentUser?._id === comment.userId || currentUser?.isAdmin) && (
-                  <>
-                    <button 
-                      onClick={() => handleEdit(comment._id, comment.content)}
-                      className='text-sm text-gray-500 hover:text-green-500'
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setCommentToDelete(comment._id);
-                        setShowModal(true);
-                      }}
-                      className='text-sm text-gray-500 hover:text-red-500'
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <Modal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        popup
-        size='md'
-      >
-        <Modal.Header />
-        <Modal.Body>
-          <div className='text-center'>
-            <HiOutlineExclamationCircle className='h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
-            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>
-              Are you sure you want to delete this comment?
-            </h3>
-            <div className='flex justify-center gap-4'>
-              <Button
-                color='failure'
-                onClick={() => handleDelete(commentToDelete)}
-              >
-                Yes, I'm sure
-              </Button>
-              <Button color='gray' onClick={() => setShowModal(false)}>
-                No, cancel
-              </Button>
-            </div>
+      {comments.length > 0 ? (
+  <div className='space-y-4 mt-8'>
+    {comments.map(comment => (
+      <div key={comment._id} className='flex flex-col gap-2 border-b border-gray-200 dark:border-gray-800 pb-4'>
+        <div className='flex items-center gap-2'>
+          <img 
+            src={comment.user?.profilePicture || '/default-profile.jpg'} 
+            alt='' 
+            className='w-8 h-8 rounded-full object-cover'
+          />
+          <div className='flex flex-col'>
+            <span className='text-sm font-semibold'>{comment.user?.username || 'Anonymous'}</span>
+            <span className='text-xs text-gray-500'>
+              {new Date(comment.createdAt).toLocaleDateString()}
+            </span>
           </div>
-        </Modal.Body>
-      </Modal>
-    </div>
+        </div>
+        <p className='text-gray-700 dark:text-gray-300'>{comment.content}</p>
+        <div className='flex gap-2 items-center'>
+          <button 
+            onClick={() => handleLike(comment._id)}
+            className='text-sm text-gray-500 hover:text-blue-500'
+          >
+            Like ({comment.numberOfLikes || 0})
+          </button>
+          {(currentUser?._id === comment.userId || currentUser?.isAdmin) && (
+            <>
+              <button 
+                onClick={() => handleEdit(comment._id, comment.content)}
+                className='text-sm text-gray-500 hover:text-green-500'
+              >
+                Edit
+              </button>
+              <button 
+                onClick={() => {
+                  setCommentToDelete(comment._id);
+                  setShowModal(true);
+                }}
+                className='text-sm text-gray-500 hover:text-red-500'
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <p className='text-gray-500 text-sm mt-8'>No comments yet. Be the first to comment!</p>
+)}
+  </div>
   );
 }
