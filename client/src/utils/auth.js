@@ -23,3 +23,38 @@ export const checkAuth = () => {
     return false;
   }
 };
+
+export const refreshToken = async () => {
+  try {
+    const currentToken = Cookies.get('access_token');
+    if (!currentToken) return false;
+
+    const res = await fetch('https://geomancy-blog.onrender.com/api/auth/refresh', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${currentToken}`
+      },
+      credentials: 'include'
+    });
+
+    if (!res.ok) {
+      Cookies.remove('access_token');
+      return false;
+    }
+
+    const data = await res.json();
+    if (data.token) {
+      Cookies.set('access_token', data.token, { 
+        expires: 7,
+        secure: true,
+        sameSite: 'strict'
+      });
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return false;
+  }
+};
