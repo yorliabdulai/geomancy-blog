@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Comment from './Comment';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import Cookies from 'js-cookie';
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -15,28 +16,38 @@ export default function CommentSection({ postId }) {
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (comment.length > 200) {
-      return;
-    }
+    if (comment.length > 200) return;
+    
     try {
+      const token = Cookies.get('access_token');
+      if (!token) {
+        setCommentError('Please log in to comment');
+        return;
+      }
+
       const res = await fetch('https://geomancy-blog.onrender.com/api/comment/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({
           content: comment,
-          postId,
-          userId: currentUser._id,
-        }),
+          postId
+        })
       });
+
       const data = await res.json();
-      if (res.ok) {
-        setComment('');
-        setCommentError(null);
-        setComments([data, ...comments]);
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to create comment');
       }
+
+      setComment('');
+      setCommentError(null);
+      setComments([data, ...comments]);
     } catch (error) {
+      console.error('Comment error:', error);
       setCommentError(error.message);
     }
   };
