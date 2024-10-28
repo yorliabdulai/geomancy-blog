@@ -275,6 +275,7 @@ export default function CommentSection({ postId }) {
       </div>
     ) : (
       <p className='text-gray-500 text-sm mt-8'>No comments yet. Be the first to comment!</p>
-    )}
+      )}
+    </div>
   );
 }
