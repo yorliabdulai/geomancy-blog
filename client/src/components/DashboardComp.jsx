@@ -52,7 +52,14 @@ export default function DashboardComp() {
 
     const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/post/getposts?limit=5');
+        const token = Cookies.get('access_token');
+        const res = await fetch('https://geomancy-blog.onrender.com/api/post/getposts?limit=5', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);
@@ -60,12 +67,18 @@ export default function DashboardComp() {
           setLastMonthPosts(data.lastMonthPosts);
         }
       } catch (error) {
-        console.log(error.message);
+        console.error('Error fetching posts:', error);
       }
     };
     const fetchComments = async () => {
       try {
-        const res = await fetch('https://geomancy-blog.onrender.com/api/comment/getcomments?limit=5');
+        const res = await fetch('https://geomancy-blog.onrender.com/api/comment/getcomments?limit=5', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);

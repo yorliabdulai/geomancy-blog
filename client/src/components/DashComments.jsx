@@ -2,6 +2,7 @@ import { Modal, Table, Button } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import Cookies from 'js-cookie';
 
 
 export default function DashComments() {
@@ -13,7 +14,14 @@ export default function DashComments() {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`https://geomancy-blog.onrender.com/api/comment/getcomments`);
+        const token = Cookies.get('access_token');
+        const res = await fetch('https://geomancy-blog.onrender.com/api/comment/getcomments', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);
@@ -22,7 +30,7 @@ export default function DashComments() {
           }
         }
       } catch (error) {
-        console.log(error.message);
+        console.error('Error fetching comments:', error);
       }
     };
     if (currentUser.isAdmin) {
@@ -49,12 +57,17 @@ export default function DashComments() {
   };
 
   const handleDeleteComment = async () => {
-    setShowModal(false);
     try {
+      const token = Cookies.get('access_token');
       const res = await fetch(
         `https://geomancy-blog.onrender.com/api/comment/deleteComment/${commentIdToDelete}`,
         {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
         }
       );
       const data = await res.json();
@@ -63,11 +76,9 @@ export default function DashComments() {
           prev.filter((comment) => comment._id !== commentIdToDelete)
         );
         setShowModal(false);
-      } else {
-        console.log(data.message);
       }
     } catch (error) {
-      console.log(error.message);
+      console.error('Error deleting comment:', error);
     }
   };
 
