@@ -58,3 +58,37 @@ export const refreshToken = async () => {
     return false;
   }
 };
+
+export const getAuthHeader = () => {
+  const token = Cookies.get('access_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
+export const makeAuthRequest = async (url, options = {}) => {
+  const token = Cookies.get('access_token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    credentials: 'include',
+  });
+
+  if (response.status === 401) {
+    const refreshed = await refreshToken();
+    if (!refreshed) {
+      throw new Error('Authentication failed');
+    }
+    return makeAuthRequest(url, options);
+  }
+
+  return response;
+};
