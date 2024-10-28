@@ -1,4 +1,4 @@
-import { Alert, Button, Modal, TextInput, Textarea } from 'flowbite-react';
+import { Alert, Button, Modal, Textarea } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,10 +14,11 @@ export default function CommentSection({ postId }) {
   const [showModal, setShowModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (comment.length > 200) return;
-    
+
     try {
       const token = Cookies.get('access_token');
       if (!token) {
@@ -114,13 +115,13 @@ export default function CommentSection({ postId }) {
         method: 'DELETE',
       });
       if (res.ok) {
-        const data = await res.json();
         setComments(comments.filter((comment) => comment._id !== commentId));
       }
     } catch (error) {
       console.log(error.message);
     }
   };
+
   return (
     <div className='max-w-2xl mx-auto w-full p-3'>
       {currentUser ? (
@@ -176,26 +177,53 @@ export default function CommentSection({ postId }) {
       {comments.length === 0 ? (
         <p className='text-sm my-5'>No comments yet!</p>
       ) : (
-        <>
-          <div className='text-sm my-5 flex items-center gap-1'>
-            <p>Comments</p>
-            <div className='border border-gray-400 py-1 px-2 rounded-sm'>
-              <p>{comments.length}</p>
+        <div className='space-y-4 mt-8'>
+          {comments.map(comment => (
+            <div key={comment._id} className='flex flex-col gap-2 border-b border-gray-200 dark:border-gray-800 pb-4'>
+              <div className='flex items-center gap-2'>
+                <img 
+                  src={comment.user?.profilePicture || '/default-profile.jpg'} 
+                  alt='' 
+                  className='w-8 h-8 rounded-full object-cover'
+                />
+                <div className='flex flex-col'>
+                  <span className='text-sm font-semibold'>{comment.user?.username || 'Anonymous'}</span>
+                  <span className='text-xs text-gray-500'>
+                    {new Date(comment.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              <p className='text-gray-700 dark:text-gray-300'>{comment.content}</p>
+              <div className='flex gap-2 items-center'>
+                <button 
+                  onClick={() => handleLike(comment._id)}
+                  className='text-sm text-gray-500 hover:text-blue-500'
+                >
+                  Like ({comment.numberOfLikes || 0})
+                </button>
+                {(currentUser?._id === comment.userId || currentUser?.isAdmin) && (
+                  <>
+                    <button 
+                      onClick={() => handleEdit(comment._id, comment.content)}
+                      className='text-sm text-gray-500 hover:text-green-500'
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setCommentToDelete(comment._id);
+                        setShowModal(true);
+                      }}
+                      className='text-sm text-gray-500 hover:text-red-500'
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-          {comments.map((comment) => (
-            <Comment
-              key={comment._id}
-              comment={comment}
-              onLike={handleLike}
-              onEdit={handleEdit}
-              onDelete={(commentId) => {
-                setShowModal(true);
-                setCommentToDelete(commentId);
-              }}
-            />
           ))}
-        </>
+        </div>
       )}
       <Modal
         show={showModal}
