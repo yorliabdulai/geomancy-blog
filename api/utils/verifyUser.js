@@ -1,33 +1,44 @@
 import jwt from 'jsonwebtoken';
 import { errorHandler } from '../utils/error.js';
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   try {
-    // Log incoming request details
-    console.log('Headers:', req.headers);
-    console.log('Cookies:', req.cookies);
+    console.log('Request headers:', req.headers);
+    console.log('Request cookies:', req.cookies);
     
-    // Check both cookie and Authorization header
-    const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.startsWith('Bearer ') 
+      ? authHeader.substring(7) 
+      : null;
+    
     console.log('Extracted token:', token);
-    
+
     if (!token) {
-      console.log('No token found in request');
-      return res.status(401).json({ success: false, message: 'No authentication token provided' });
+      console.log('No token found');
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Authentication required' 
+      });
     }
 
-    // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded);
-    
-    req.user = decoded;
-    next();
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log('Decoded token:', decoded);
+      req.user = decoded;
+      next();
+    } catch (err) {
+      console.error('Token verification failed:', err);
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid token' 
+      });
+    }
   } catch (error) {
-    console.error('Token verification error:', error);
-    return res.status(401).json({ 
+    console.error('Auth middleware error:', error);
+    return res.status(500).json({ 
       success: false, 
-      message: 'Invalid or expired token',
-      error: error.message 
+      message: 'Server error during authentication' 
     });
   }
 };

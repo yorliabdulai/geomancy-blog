@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Button, Textarea } from 'flowbite-react';
 import Cookies from 'js-cookie';
 import Comment from './Comment'; // The existing Comment component
+import { checkAuth } from '../utils/auth'; // Implied import for checkAuth function
 
 export default function CommentSection({ postId }) {
   const [comments, setComments] = useState([]);
@@ -12,6 +13,11 @@ export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
+    const isAuthenticated = checkAuth();
+    if (!isAuthenticated) {
+      console.log('User is not authenticated');
+      // Handle unauthenticated state
+    }
     console.log('Current user:', currentUser); // Log the current user
     console.log('Access token:', Cookies.get('access_token')); // Log the access token
     fetchComments();
@@ -37,66 +43,45 @@ export default function CommentSection({ postId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Check if user is logged in
-      console.log('Current user state:', currentUser);
-      
-      // Get and verify token
       const token = Cookies.get('access_token');
-      console.log('Raw token from cookies:', token);
-      
+      console.log('Attempting to create comment with token:', token); // Debug log
+
       if (!token) {
-        console.error('Authentication error: No token found');
         setError('Please log in to comment');
         return;
       }
 
-      // Log the request details
-      const requestBody = {
-        content: commentContent,
-        postId
-      };
-      console.log('Request body:', requestBody);
-      console.log('Request headers:', {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      });
-
-      // Make the request
-      const res = await fetch('https://geomancy-blog.onrender.com/api/comment/create', {
+      // Create the request with explicit headers
+      const response = await fetch('https://geomancy-blog.onrender.com/api/comment/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          // Add additional headers that might help with CORS
-          'Accept': 'application/json',
-          'Access-Control-Allow-Credentials': 'true'
+          'Accept': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          content: commentContent,
+          postId
+        })
       });
 
-      // Log response details
-      console.log('Response status:', res.status);
-      console.log('Response headers:', Object.fromEntries([...res.headers]));
+      // Log the full response for debugging
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries([...response.headers]));
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(e => ({ message: 'Could not parse error response' }));
-        console.error('Error response data:', errorData);
-        throw new Error(errorData.message || `Server returned ${res.status}`);
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create comment');
       }
 
-      const data = await res.json();
-      console.log('Success response:', data);
-      
       setComments([data, ...comments]);
       setCommentContent('');
       setError(null);
     } catch (error) {
-      console.error('Full error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
+      console.error('Error creating comment:', error);
       setError(error.message || 'Something went wrong');
     }
   };

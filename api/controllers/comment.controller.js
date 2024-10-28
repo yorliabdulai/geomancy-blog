@@ -2,18 +2,30 @@ import Comment from '../models/comment.model.js';
 
 export const createComment = async (req, res, next) => {
   try {
+    console.log('Request user:', req.user);
+    console.log('Request body:', req.body);
+
     const { content, postId } = req.body;
 
-    // Use req.user.id instead of trusting userId from the request body
+    if (!content || !postId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Content and postId are required'
+      });
+    }
+
     const newComment = new Comment({
       content,
       postId,
       userId: req.user.id,
     });
-    await newComment.save();
 
-    res.status(200).json(newComment);
+    const savedComment = await newComment.save();
+    console.log('Saved comment:', savedComment);
+
+    res.status(201).json(savedComment);
   } catch (error) {
+    console.error('Create comment error:', error);
     next(error);
   }
 };
