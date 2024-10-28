@@ -13,13 +13,19 @@ dotenv.config(); // Load env variables
 
 const app = express();
 
-// Enable CORS
+// CORS configuration
 app.use(cors({
-  origin: 'https://geomancy-blog.vercel.app', 
+  origin: ['https://geomancy-blog.vercel.app'],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Additional headers
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 

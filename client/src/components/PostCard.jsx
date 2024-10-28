@@ -5,9 +5,13 @@ export default function PostCard({ post }) {
     <div className='group relative w-full border border-teal-500 hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[430px] transition-all'>
       <Link to={`/post/${post.slug}`}>
         <img
-          src={post.image}
+          src={post.image.startsWith('http') ? post.image : `/${post.image}`}
           alt='post cover'
-          className='h-[260px] w-full  object-cover group-hover:h-[200px] transition-all duration-300 z-20'
+          className='h-[260px] w-full object-cover group-hover:h-[200px] transition-all duration-300 z-20'
+          onError={(e) => {
+            e.target.src = '/default-post-image.jpg'; // Add a default image
+            console.log('Image load error:', e);
+          }}
         />
       </Link>
       <div className='p-3 flex flex-col gap-2'>

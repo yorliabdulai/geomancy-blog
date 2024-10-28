@@ -22,9 +22,6 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
-      return dispatch(signInFailure('Please fill all the fields'));
-    }
     try {
       dispatch(signInStart());
       const res = await fetch('https://geomancy-blog.onrender.com/api/auth/signin', {
@@ -33,25 +30,27 @@ export default function SignIn() {
         body: JSON.stringify(formData),
         credentials: 'include',
       });
+
       const data = await res.json();
-      if (data.success === false) {
+      console.log('Sign-in response:', data);
+
+      if (!res.ok) {
         dispatch(signInFailure(data.message));
+        return;
       }
 
-      if (res.ok) {
-        console.log('Server response:', data); // Log the entire response
-        console.log('Token received:', data.token); // Log the token
-        
-        if (data.token) {
-          Cookies.set('access_token', data.token, { expires: 7 });
-          console.log('Cookie set:', Cookies.get('access_token')); // Verify the cookie was set
-        } else {
-          console.error('No token received from server');
-        }
-        
-        dispatch(signInSuccess(data));
-        navigate('/');
+      // Store token in cookie
+      if (data.token) {
+        Cookies.set('access_token', data.token, {
+          expires: 7,
+          secure: true,
+          sameSite: 'strict'
+        });
+        console.log('Token stored in cookie:', Cookies.get('access_token'));
       }
+
+      dispatch(signInSuccess(data));
+      navigate('/');
     } catch (error) {
       console.error('Sign-in error:', error);
       dispatch(signInFailure(error.message));

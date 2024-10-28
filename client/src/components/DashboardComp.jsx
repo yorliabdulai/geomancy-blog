@@ -8,6 +8,7 @@ import {
 } from 'react-icons/hi';
 import { Button, Table } from 'flowbite-react';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 export default function DashboardComp() {
   const [users, setUsers] = useState([]);
@@ -23,17 +24,32 @@ export default function DashboardComp() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch('https://geomancy-blog.onrender.com/api/user/getusers?limit=5');
+        // Get the token
+        const token = Cookies.get('access_token');
+        console.log('Token for users request:', token);
+
+        const res = await fetch('https://geomancy-blog.onrender.com/api/user/getusers?limit=5', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        console.log('Users response status:', res.status);
         const data = await res.json();
+        console.log('Users response data:', data);
+
         if (res.ok) {
           setUsers(data.users);
           setTotalUsers(data.totalUsers);
           setLastMonthUsers(data.lastMonthUsers);
         }
       } catch (error) {
-        console.log(error.message);
+        console.error('Error fetching users:', error);
       }
     };
+
     const fetchPosts = async () => {
       try {
         const res = await fetch('/api/post/getposts?limit=5');

@@ -2,20 +2,32 @@ import jwt from 'jsonwebtoken';
 import { errorHandler } from '../utils/error.js';
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    console.log('No token found');
-    return next(errorHandler(401, 'Unauthorized - No token provided'));
-  }
-
   try {
+    // Log incoming request details
+    console.log('Headers:', req.headers);
+    console.log('Cookies:', req.cookies);
+    
+    // Check both cookie and Authorization header
+    const token = req.cookies.access_token || req.headers.authorization?.split(' ')[1];
+    console.log('Extracted token:', token);
+    
+    if (!token) {
+      console.log('No token found in request');
+      return res.status(401).json({ success: false, message: 'No authentication token provided' });
+    }
+
+    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
     console.log('Decoded token:', decoded);
+    
+    req.user = decoded;
     next();
   } catch (error) {
     console.error('Token verification error:', error);
-    return next(errorHandler(401, 'Unauthorized - Invalid token'));
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Invalid or expired token',
+      error: error.message 
+    });
   }
 };
