@@ -37,44 +37,66 @@ export default function CommentSection({ postId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Check if user is logged in
+      console.log('Current user state:', currentUser);
+      
+      // Get and verify token
       const token = Cookies.get('access_token');
-      console.log('Token from cookie:', token); // Log the token
-
+      console.log('Raw token from cookies:', token);
+      
       if (!token) {
-        console.log('No token found in cookies');
+        console.error('Authentication error: No token found');
         setError('Please log in to comment');
         return;
       }
 
-      console.log('Sending request to create comment');
+      // Log the request details
+      const requestBody = {
+        content: commentContent,
+        postId
+      };
+      console.log('Request body:', requestBody);
+      console.log('Request headers:', {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      });
+
+      // Make the request
       const res = await fetch('https://geomancy-blog.onrender.com/api/comment/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          // Add additional headers that might help with CORS
+          'Accept': 'application/json',
+          'Access-Control-Allow-Credentials': 'true'
         },
         credentials: 'include',
-        body: JSON.stringify({
-          content: commentContent,
-          postId
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      console.log('Response status:', res.status); // Log the response status
+      // Log response details
+      console.log('Response status:', res.status);
+      console.log('Response headers:', Object.fromEntries([...res.headers]));
 
       if (!res.ok) {
-        const errorData = await res.json();
-        console.log('Error response:', errorData); // Log the error response
-        throw new Error(errorData.message || `Failed to create comment: ${res.status}`);
+        const errorData = await res.json().catch(e => ({ message: 'Could not parse error response' }));
+        console.error('Error response data:', errorData);
+        throw new Error(errorData.message || `Server returned ${res.status}`);
       }
 
       const data = await res.json();
-      console.log('Success response:', data); // Log the success response
+      console.log('Success response:', data);
+      
       setComments([data, ...comments]);
       setCommentContent('');
       setError(null);
     } catch (error) {
-      console.error('Error creating comment:', error);
+      console.error('Full error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       setError(error.message || 'Something went wrong');
     }
   };
