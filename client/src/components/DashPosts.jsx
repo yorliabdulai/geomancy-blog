@@ -98,6 +98,10 @@ export default function DashPosts() {
                         src={post.image}
                         alt={post.title}
                         className='w-20 h-10 object-cover bg-gray-500'
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/default-post-image.jpg';
+                        }}
                       />
                     </Link>
                   </Table.Cell>

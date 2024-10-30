@@ -198,7 +198,7 @@ export default function CommentSection({ postId }) {
           />
           <div className='flex flex-col'>
             <span className='text-sm font-semibold'>
-              {comment.user?.username || 'Deleted User'}
+              {comment.user?.username || 'Anonymous'}
             </span>
             <span className='text-xs text-gray-500'>
               {new Date(comment.createdAt).toLocaleDateString()}

@@ -1,22 +1,15 @@
 import { Link } from 'react-router-dom';
 
 export default function PostCard({ post }) {
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/default-post-image.jpg';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('/')) return imageUrl;
-    return `/${imageUrl}`;
-  };
-
   return (
-    <div className='group relative w-full border border-teal-500 hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[430px] transition-all'>
+    <div className='group relative border border-teal-500 hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[430px] transition-all'>
       <Link to={`/post/${post.slug}`}>
         <img
-          src={getImageUrl(post.image)}
+          src={post.image}
           alt={post.title}
           className='h-[260px] w-full object-cover group-hover:h-[200px] transition-all duration-300 z-20'
           onError={(e) => {
-            console.log('Image load error for:', post.image);
+            e.target.onerror = null;
             e.target.src = '/default-post-image.jpg';
           }}
         />
