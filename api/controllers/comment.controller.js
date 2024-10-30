@@ -32,10 +32,23 @@ export const createComment = async (req, res, next) => {
 
 export const getPostComments = async (req, res, next) => {
   try {
-    const comments = await Comment.find({ postId: req.params.postId }).sort({
-      createdAt: -1,
-    });
-    res.status(200).json(comments);
+    const comments = await Comment.find({ postId: req.params.postId })
+      .populate('userId', 'username profilePicture')
+      .sort({ createdAt: -1 });
+
+    const formattedComments = comments.map(comment => ({
+      _id: comment._id,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      likes: comment.likes,
+      numberOfLikes: comment.numberOfLikes,
+      user: {
+        username: comment.userId?.username || 'Deleted User',
+        profilePicture: comment.userId?.profilePicture || '/default-profile.jpg'
+      }
+    }));
+
+    res.status(200).json(formattedComments);
   } catch (error) {
     next(error);
   }

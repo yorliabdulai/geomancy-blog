@@ -70,29 +70,37 @@ export default function CommentSection({ postId }) {
 
   const handleLike = async (commentId) => {
     try {
-      if (!currentUser) {
-        navigate('/sign-in');
+      const token = Cookies.get('access_token');
+      if (!token) {
+        setError('Please sign in to like comments');
         return;
       }
+
       const res = await fetch(`https://geomancy-blog.onrender.com/api/comment/likeComment/${commentId}`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       });
-      if (res.ok) {
-        const data = await res.json();
-        setComments(
-          comments.map((comment) =>
-            comment._id === commentId
-              ? {
-                  ...comment,
-                  likes: data.likes,
-                  numberOfLikes: data.likes.length,
-                }
-              : comment
-          )
-        );
+
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) {
+          navigate('/sign-in');
+          return;
+        }
+        throw new Error(data.message || 'Failed to like comment');
       }
+
+      setComments(comments.map(comment => 
+        comment._id === commentId 
+          ? { ...comment, likes: data.likes, numberOfLikes: data.likes.length }
+          : comment
+      ));
     } catch (error) {
-      console.log(error.message);
+      setError(error.message || 'Error liking comment');
     }
   };
 
@@ -180,12 +188,18 @@ export default function CommentSection({ postId }) {
       <div key={comment._id} className='flex flex-col gap-2 border-b border-gray-200 dark:border-gray-800 pb-4'>
         <div className='flex items-center gap-2'>
           <img 
-            src={comment.user?.profilePicture || '/default-profile.jpg'} 
-            alt='' 
+            src={comment.user?.profilePicture}
+            alt={comment.user?.username} 
             className='w-8 h-8 rounded-full object-cover'
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/default-profile.jpg';
+            }}
           />
           <div className='flex flex-col'>
-            <span className='text-sm font-semibold'>{comment.user?.username || 'Anonymous'}</span>
+            <span className='text-sm font-semibold'>
+              {comment.user?.username || 'Deleted User'}
+            </span>
             <span className='text-xs text-gray-500'>
               {new Date(comment.createdAt).toLocaleDateString()}
             </span>
@@ -195,7 +209,9 @@ export default function CommentSection({ postId }) {
         <div className='flex gap-2 items-center'>
           <button 
             onClick={() => handleLike(comment._id)}
-            className='text-sm text-gray-500 hover:text-blue-500'
+            className={`text-sm ${comment.likes?.includes(currentUser?._id) 
+              ? 'text-blue-500' 
+              : 'text-gray-500'} hover:text-blue-500`}
           >
             Like ({comment.numberOfLikes || 0})
           </button>
@@ -208,10 +224,7 @@ export default function CommentSection({ postId }) {
                 Edit
               </button>
               <button 
-                onClick={() => {
-                  setCommentToDelete(comment._id);
-                  setShowModal(true);
-                }}
+                onClick={() => handleDelete(comment._id)}
                 className='text-sm text-gray-500 hover:text-red-500'
               >
                 Delete
