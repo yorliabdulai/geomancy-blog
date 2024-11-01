@@ -1,9 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
+import Cookies from 'js-cookie';
+
+const persistConfig = {
+  key: 'user',
+  storage,
+  whitelist: ['currentUser']
+};
 
 const initialState = {
   currentUser: null,
-  error: null,
   loading: false,
+  error: null
 };
 
 const userSlice = createSlice({
@@ -53,6 +60,7 @@ const userSlice = createSlice({
       state.currentUser = null;
       state.error = null;
       state.loading = false;
+      Cookies.remove('access_token');
     },
   },
 });

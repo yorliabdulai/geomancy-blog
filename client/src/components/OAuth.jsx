@@ -5,6 +5,7 @@ import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
 import { signInSuccess } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 export default function OAuth() {
     const auth = getAuth(app)
@@ -14,19 +15,20 @@ export default function OAuth() {
         const provider = new GoogleAuthProvider()
         provider.setCustomParameters({ prompt: 'select_account' })
         try {
-            const resultsFromGoogle = await signInWithPopup(auth, provider)
-            const res = await fetch('https://geomancy-blog.onrender.com/api/auth/google', {
+            const result = await signInWithPopup(auth, provider)
+            const response = await fetch('https://geomancy-blog.onrender.com/api/auth/google', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: resultsFromGoogle.user.displayName,
-                    email: resultsFromGoogle.user.email,
-                    googlePhotoUrl: resultsFromGoogle.user.photoURL,
+                    name: result.user.displayName,
+                    email: result.user.email,
+                    googlePhotoUrl: result.user.photoURL,
                 }),
                 })
-            const data = await res.json()
-            if (res.ok){
-                dispatch(signInSuccess(data))
+            const data = await response.json()
+            if (response.ok){
+                Cookies.set('access_token', data.token, { expires: 7 });
+                dispatch(signInSuccess(data.user))
                 navigate('/')
             }
         } catch (error) {
