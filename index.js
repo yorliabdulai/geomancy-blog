@@ -7,15 +7,15 @@ import postRoutes from './api/routes/post.route.js';
 import commentRoutes from './api/routes/comment.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import cors from 'cors';  // Updated import for consistency
+import cors from 'cors'; 
 
-dotenv.config(); // Load env variables
+dotenv.config();
 
 const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['https://geomancy-blog.vercel.app'],
+  origin: ['https://www.geomancyblog.com'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
