@@ -69,12 +69,10 @@ export default function FooterCom() {
             year={new Date().getFullYear()}
           />
           <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
-            <Footer.Icon href='#' icon={BsFacebook}/>
-            <Footer.Icon href='#' icon={BsYoutube}/>
-            <Footer.Icon href='#' icon={BsWhatsapp}/>
-            <Footer.Icon href='#' icon={BsTiktok}/>
-            
-
+            <Footer.Icon href='https://m.facebook.com/profile.php?id=61564145274142&name=xhp_nt_' icon={BsFacebook}/>
+            <Footer.Icon href='http://www.youtube.com/@GeomancyCoaching-i3q' icon={BsYoutube}/>
+            <Footer.Icon href='https://whatsapp.com/channel/0029VayEyK8LSmbduarBog16' icon={BsWhatsapp}/>
+            <Footer.Icon href='https://www.tiktok.com/@geomancycoaching?_t=8rlACbATg1v&_r=1' icon={BsTiktok}/>
           </div>
         </div>
       </div>
