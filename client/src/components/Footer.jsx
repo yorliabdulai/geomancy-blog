@@ -1,6 +1,6 @@
 import { Footer } from 'flowbite-react';
 import { Link } from 'react-router-dom';
-import { BsFacebook, BsInstagram, BsTwitter } from 'react-icons/bs';
+import { BsFacebook, BsYoutube, BsWhatsapp, BsTiktok } from 'react-icons/bs';
 export default function FooterCom() {
   return (
     <Footer container className='border border-t-8 border-teal-500'>
@@ -41,14 +41,15 @@ export default function FooterCom() {
               <Footer.Title title='Follow us' />
               <Footer.LinkGroup col>
                 <Footer.Link
-                  href='#'
+                  href='https://m.facebook.com/profile.php?id=61564145274142&name=xhp_nt_'
                   target='_blank'
                   rel='noopener noreferrer'
                 >
                  Facebook
                 </Footer.Link>
-                <Footer.Link href='#'>X</Footer.Link>
-                <Footer.Link href='#'>Instagram</Footer.Link>
+                <Footer.Link href='https://whatsapp.com/channel/0029VayEyK8LSmbduarBog16'>WhatsApp</Footer.Link>
+                <Footer.Link href='https://www.tiktok.com/@geomancycoaching?_t=8rlACbATg1v&_r=1'>Tiktok</Footer.Link>
+                <Footer.Link href='http://www.youtube.com/@GeomancyCoaching-i3q'>Youtube</Footer.Link>
               </Footer.LinkGroup>
             </div>
             <div>
@@ -69,8 +70,9 @@ export default function FooterCom() {
           />
           <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
             <Footer.Icon href='#' icon={BsFacebook}/>
-            <Footer.Icon href='#' icon={BsInstagram}/>
-            <Footer.Icon href='#' icon={BsTwitter}/>
+            <Footer.Icon href='#' icon={BsYoutube}/>
+            <Footer.Icon href='#' icon={BsWhatsapp}/>
+            <Footer.Icon href='#' icon={BsTiktok}/>
             
 
           </div>
