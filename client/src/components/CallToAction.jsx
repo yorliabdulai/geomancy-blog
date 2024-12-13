@@ -17,7 +17,7 @@ export default function CallToAction() {
             </Button>
         </div>
         <div className="p-7 flex-1">
-            <img src="geo-expert.jpg" />
+            <img src='url("https://digitalambler.com/wp-content/uploads/2019/04/raml_lines.jpg")' />
         </div>
     </div>
   )
